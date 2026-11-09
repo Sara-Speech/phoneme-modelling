@@ -4,10 +4,12 @@ from pandas import DataFrame
 from pathlib import Path
 
 from phoneme_modelling.schema.gemini_config import GeminiConfig
+from phoneme_modelling.schema.google_tts_config import GoogleTTSConfig
 from phoneme_modelling.schema.openai_config import OpenAIConfig
 from phoneme_modelling.schema.phoneme_pipeline_config import PhonemePipelineConfig
 from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 from phoneme_modelling.synthetic_audio.generators.gemini import GeminiAudioGenerator
+from phoneme_modelling.synthetic_audio.generators.google_tts import GoogleTTSGenerator
 from phoneme_modelling.synthetic_audio.generators.openai_realtime import OpenAIAudioGenerator
 from phoneme_modelling.synthetic_audio.generation import SyntheticAudioGenerator
 from phoneme_modelling.synthetic_audio.generator_factory import SyntheticAudioGeneratorFactory
@@ -20,6 +22,7 @@ class SyntheticAudioPipeline():
         factory = SyntheticAudioGeneratorFactory()
         factory.register(GeminiAudioGenerator, GeminiConfig)
         factory.register(OpenAIAudioGenerator, OpenAIConfig)
+        factory.register(GoogleTTSGenerator, GoogleTTSConfig)
         return factory.generate(configs)
 
     @classmethod

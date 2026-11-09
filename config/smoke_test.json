@@ -35,6 +35,12 @@
             ],
             "ref_dir": "inputs/reference_recordings",
             "prompts_file": "config/prompts.csv"
+        },
+        "google_tts": {
+            "project": "capstone-510119",
+            "voices": [
+                "en-US-Neural2-F"
+            ]
         }
     },
     "distorter_configs": {
