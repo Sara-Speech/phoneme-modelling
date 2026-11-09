@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "certifi>=2026.10.23",
+    "google-cloud-texttospeech>=2.38.0",
     "google-genai>=2.33.0",
     "lhotse>=1.33.0",
     "librosa>=1.0.0",

@@ -69,6 +69,22 @@ real recordings of the other sound, and the clean clips here already provide tho
 3. Add both classes to `PAIR_DISTORTERS` in `distortion/pair_registry.py`, and add their names to `distorter_configs`
    in the config.
 
+## Google Cloud TTS generator
+
+`google_tts` (in `generator_configs`) speaks each sound with an SSML IPA tag inside "Please say ___ again.", finds the
+sound with forced alignment (wav2vec2 espeak), crops it and preps it like the other generators. Continuants (r, l, w, y,
+s, z, sh, f, v, h, m, n, ng) are held by repeating their symbol inside the tag (`hold_repeats`, default 8, about 0.3 to
+0.7 s). Stops, ch, j and the two th sounds are short single clips (ch and j get a longer fricative half), so they are
+made once per voice. Several values in `hold_repeats` make numbered takes (`..._take1`, `..._take2`) for held sounds.
+
+- **Credentials:** Application Default Credentials for a project with the Cloud Text-to-Speech API enabled
+  (`gcloud auth application-default login`, or `auth.authenticate_user()` in Colab). `project` is the quota project.
+- **Voices:** any Cloud TTS voice name that supports IPA tags (Standard, Wavenet, Neural2). The voice name in a clip's
+  name is the short form, e.g. `neural2f`.
+- **Distortions:** this generator makes correct clips only. Add the new voices' pitch to `config/distortion/voice_f0.json`
+  so the pair distorters use the right F0 for them (otherwise they fall back to the default).
+- **Tests:** `cd src && uv run pytest ../tests/synthetic_audio`
+
 ## Tests
 
 ```bash
