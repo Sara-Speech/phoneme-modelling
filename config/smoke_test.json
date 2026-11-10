@@ -21,7 +21,6 @@
     },
     "generator_configs": {
         "gemini": {
-            "project": "capstone-510119",
             "location": "us-central1",
             "model": "gemini-3.8-live",
             "voices": [
@@ -39,7 +38,6 @@
             "prompts_file": "config/prompts.csv"
         },
         "google_tts": {
-            "project": "capstone-510119",
             "voices": [
                 "en-US-Neural2-F"
             ]
