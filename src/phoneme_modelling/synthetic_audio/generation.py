@@ -52,9 +52,9 @@ class SyntheticAudioGenerationVoice(ABC):
             distort_to_text=distort_to_text,
             distort_to_ipa=distort_to_ipa
         )
-        has_attempted_generation = False
+        # A failed attempt (no file, or a file that fails validation) is retried until the retry budget runs out.
         for _ in retry_mechanism.attempts(target_file_path):
-            has_attempted_generation = self._generate_audio(
+            self._generate_audio(
                 target_file_path=target_file_path,
                 text=text,
                 ipa=ipa,
@@ -62,8 +62,6 @@ class SyntheticAudioGenerationVoice(ABC):
                 distort_to_text=distort_to_text,
                 distort_to_ipa=distort_to_ipa
             )
-            if not has_attempted_generation:
-                return False
         return retry_mechanism.is_success(target_file_path)
 
     def __validate_audio_generation_input(
