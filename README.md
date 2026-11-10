@@ -11,6 +11,24 @@ make run           # both
 
 Settings live in `config/default.json`.
 
+## Required Setup
+
+1. **Google Cloud Platform (GCP) Authentication & APIs:**
+   * Authenticate your local environment using the Google Cloud CLI[cite: 4]:
+     ```bash
+     gcloud auth application-default login
+     ```
+   * Ensure you have a GCP project to serve as your quota project[cite: 4].
+   * Enable the **Agent Platform API** and the **Cloud Text-to-Speech API** in your GCP project[cite: 4].
+
+2. **Environment Variables:**
+   * Retrieve the OpenAI API key from the AWS Secrets Manager: [openai_content_gen](https://381492152880-dopmmgh3.us-east-2.console.aws.amazon.com/secretsmanager/secret?name=openai_content_gen&region=us-east-2&tab=overview#).
+   * Create a `.env` file in the root of the project with your OpenAI API key and GCP project ID[cite: 2]:
+     ```env
+     OPENAI_API_KEY=your_retrieved_aws_secret
+     GCP_PROJECT=your_gcp_project_id
+     ```
+
 ## Distortions
 
 A distortion edits a clean recording of a correct sound until it sounds like a common mistake, such as "r" said as
