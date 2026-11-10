@@ -8,6 +8,7 @@ import numpy as np
 from pydantic import BaseModel
 
 from phoneme_modelling.distortion.distorter import AudioDistorter
+from phoneme_modelling.distortion.types import DistortionType
 from phoneme_modelling.phonemes import TEXT_TO_IPA
 from phoneme_modelling.schema.pair_parameters import NuisanceSample, PairParameters
 from phoneme_modelling.util.acoustics import dsp
@@ -72,6 +73,9 @@ class PairDistorter(AudioDistorter):
         """Returns whether the generation method is non-deterministic and can yield a different result if retried."""
         return False
 
+    def get_type(self) -> str:
+        return DistortionType.TOWARDS_PHONEME.value
+
     def alpha_for(self, distortion_intensity: float) -> Optional[float]:
         """Calibrated edit strength: 0.6 reaches 60% of the natural difference between the two sounds, 1 all of it.
         None for a strength that is not in INTENSITIES."""
@@ -87,7 +91,7 @@ class PairDistorter(AudioDistorter):
         original_phoneme_ipa: str,
         distortion_intensity: float,
         distorted_file_path: Path,
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, Optional[str], Optional[str]]:
         """
         Applies distortion to original audio with desired intensity and saves distorted audio to new file, returning
         true if successful or false if the audio was rejected and optionally the ipa representation for the distorted
@@ -95,10 +99,10 @@ class PairDistorter(AudioDistorter):
         """
         alpha = self.alpha_for(distortion_intensity)
         if alpha is None:
-            return False, None
+            return False, None, None
         samples = load_as_numpy_array(original_file_path, SAMPLE_RATE).astype(np.float64)
         if dsp.rms(samples) == 0.0:
-            return False, None
+            return False, None, None
         # The leading number is the pipeline's running counter; leaving it out keeps audio independent of run order.
         seed_name = original_file_path.stem.partition("_")[2]
         try:
@@ -107,11 +111,11 @@ class PairDistorter(AudioDistorter):
                 delivered = self.__match_nuisance(delivered, seed_name, distortion_intensity)
         except (ValueError, IndexError, RuntimeError) as error:  # one bad clip must not stop the batch
             print(f"Rejected {original_file_path} for {self.get_name()}: {error}")
-            return False, None
+            return False, None, None
         if delivered is None:
-            return False, None
+            return False, None, None
         save_wav(distorted_file_path, delivered)
-        return True, self.__distorted_ipa(distortion_intensity)
+        return True, self.__distorted_ipa(distortion_intensity), self.__distorted_to_ipa(distortion_intensity)
 
     def __distort_samples(
         self, samples: np.ndarray, seed_name: str, distortion_intensity: float, alpha: float
@@ -128,10 +132,14 @@ class PairDistorter(AudioDistorter):
         return self.__voice_f0.get(voice_of(seed_name), DEFAULT_F0)
 
     def __distorted_ipa(self, distortion_intensity: float) -> str:
-        from_percentage = int(round((1 - distortion_intensity) * 100))
-        to_percentage = int(round(distortion_intensity * 100))
-        from_ipa, to_ipa = TEXT_TO_IPA[self.FROM_PHONEME], self.TO_IPA or TEXT_TO_IPA[self.TO_PHONEME]
-        return f"distortion[{from_ipa}({from_percentage}%)|{to_ipa}({to_percentage}%)]"
+        if distortion_intensity > 0.5:
+            return TEXT_TO_IPA[self.FROM_PHONEME]
+        return TEXT_TO_IPA[self.TO_PHONEME]
+
+    def __distorted_to_ipa(self, distortion_intensity: float) -> str:
+        if distortion_intensity > 0.5:
+            return TEXT_TO_IPA[self.TO_PHONEME]
+        return TEXT_TO_IPA[self.FROM_PHONEME]
 
     def __match_nuisance(
         self, natural: np.ndarray, seed_name: str, distortion_intensity: float
