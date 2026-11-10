@@ -69,6 +69,8 @@ class AudioDistortionPipeline():
         original_file_path = Path(audio_info.file_path)
         if not original_file_path.is_file():
             return current_audio_count, []
+        if audio_info.distortion_intensity > 0:
+            return current_audio_count, []
         generated_metadata = []
         original_phoneme_text = audio_info.actual_phoneme_text
         for distorter in distorters:
