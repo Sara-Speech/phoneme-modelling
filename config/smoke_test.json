@@ -15,6 +15,8 @@
         "interrupt_generation_on_short_audio": false,
         "max_audio_length": 10.0,
         "interrupt_generation_on_long_audio": false,
+        "min_volume_rms": 500.0,
+        "interrupt_generation_on_faint_audio": false,
         "max_number_of_retries": 3
     },
     "generator_configs": {

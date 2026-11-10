@@ -1,4 +1,7 @@
+import numpy as np
 from pathlib import Path
+
+import wave
 
 from phoneme_modelling.schema.phoneme_pipeline_config import PhonemeValidationConfig
 from phoneme_modelling.util.audio_inspector import AudioInspector
@@ -21,10 +24,12 @@ class PhonemeAudioValidator:
         """
         if not self.__validate_audio_exists(file_path):
             return False
-        duration = AudioInspector.get_info(file_path).duration  
-        if not self.__validate_audio_is_long_enough(duration):
+        audio_info = AudioInspector.get_info(file_path)  
+        if not self.__validate_audio_is_long_enough(audio_info.duration):
             return False
-        if not self.__validate_audio_is_short_enough(duration):
+        if not self.__validate_audio_is_short_enough(audio_info.duration):
+            return False
+        if not self.__validate_audio_is_loud_enough(audio_info.rms_loudness):
             return False
         return True
 
@@ -57,4 +62,13 @@ class PhonemeAudioValidator:
             return True
         if self.config.interrupt_generation_on_long_audio:
             raise AudioValidationError(f"Audio too long: {duration:.2f}s > {self.config.max_audio_length}s")
+        return False
+
+    def __validate_audio_is_loud_enough(self, rms_loudness: float) -> bool:
+        if self.config.min_volume_rms is None:
+            return True        
+        if rms_loudness >= self.config.min_volume_rms:
+            return True
+        if self.config.interrupt_generation_on_faint_audio:
+            raise AudioValidationError(f"Audio too faint: RMS {rms_loudness:.2f} is below minimum {self.config.min_volume_rms}")
         return False

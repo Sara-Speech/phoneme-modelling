@@ -77,3 +77,6 @@ generate:
 
 eval:
 	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval
+
+smoke-test:
+	uv run python src/phoneme_modelling/generate_synthetic_audio.py --config_path config/smoke_test.json
