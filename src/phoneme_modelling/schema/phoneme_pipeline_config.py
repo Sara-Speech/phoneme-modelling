@@ -17,6 +17,8 @@ class PhonemeValidationConfig(BaseModel):
     max_audio_length: Optional[float] = None
     interrupt_generation_on_long_audio: bool = False
     max_number_of_retries: Optional[int] = None
+    min_volume_rms: Optional[float] = None
+    interrupt_generation_on_faint_audio: bool = False
 
 
 class PhonemePipelineConfig(BaseModel):
