@@ -134,7 +134,7 @@ def test_generator_runs_through_the_shared_pipeline_naming(tmp_path, monkeypatch
     monkeypatch.setattr(google_tts.texttospeech, "TextToSpeechClient", lambda **kwargs: FakeTextToSpeechClient())
     monkeypatch.setattr(google_tts, "PhoneAligner", lambda: FakeAligner((0.5, 0.9)))
     generator = GoogleTTSGenerator(
-        GoogleTTSConfig(project="test", voices=["en-US-Neural2-F", "en-US-Neural2-D"], hold_repeats=[4, 8])
+        GoogleTTSConfig(voices=["en-US-Neural2-F", "en-US-Neural2-D"], hold_repeats=[4, 8])
     )
     request = PhonemePipelineConfig.model_validate(dict(
         number_of_digits=4, phonemes_to_generate=["r", "b"], generator_configs={},

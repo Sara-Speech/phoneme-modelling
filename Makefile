@@ -70,13 +70,13 @@ clean-output:
 	rm -rf phonemes
 
 run:
-	uv run python src/phoneme_modelling/generate_synthetic_audio.py
+	make clean-output && uv run python src/phoneme_modelling/generate_synthetic_audio.py
 
 generate:
-	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode generate
+	make clean-output && uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode generate
 
 eval:
 	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval
 
 smoke-test:
-	uv run python src/phoneme_modelling/generate_synthetic_audio.py --config_path config/smoke_test.json
+	make clean-output && uv run python src/phoneme_modelling/generate_synthetic_audio.py --config_path config/smoke_test.json
