@@ -77,3 +77,13 @@ generate:
 
 eval:
 	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval
+
+# LLM listeners (Gemini + OpenAI) on every clip; costs API calls. AUDIO_FOLDER=<dir> to score a downloaded Drive copy.
+eval-llm:
+	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval --config_path config/llm_listener_eval.json \
+		--evaluation_output_path data/llm_evaluation_results.csv $(if $(AUDIO_FOLDER),--audio_folder $(AUDIO_FOLDER))
+	uv run python src/phoneme_modelling/evaluation/summary.py --evaluation_path data/llm_evaluation_results.csv \
+		--output_folder data/llm_evaluation_summary
+
+eval-summary:
+	uv run python src/phoneme_modelling/evaluation/summary.py
