@@ -103,6 +103,32 @@ made once per voice. Several values in `hold_repeats` make numbered takes (`..._
   so the pair distorters use the right F0 for them (otherwise they fall back to the default).
 - **Tests:** `cd src && uv run pytest ../tests/synthetic_audio`
 
+## LLM listener evaluation
+
+`gemini_listener` (Vertex AI, default `gemini-3.8-flash`) and `openai_listener` (Chat Completions with audio input,
+default `gpt-audio-1.5`) listen to each clip without being told the target. Each one returns:
+
+- `detected_phoneme_text`: one of the 23 sounds, or `other` / `none`
+- `transcription_ipa`: a free IPA transcription of what it heard
+- `quality`: its confidence (0 to 1)
+- `notes`: anything unusual it heard
+
+A clip is correct when the heard sound is the expected sound. For a distorted clip, that is the larger share of its
+mix: the target at both 0.6 and 1. The derhotacized r (`ɹ̞`) has no label, so `r_distortion` clips are never counted
+as correct; the summary leaves them out of accuracy.
+
+```bash
+make eval-llm                                  # clips in phonemes/, results in data/llm_evaluation_results.csv
+make eval-llm AUDIO_FOLDER=~/Downloads/final   # same metadata, clips looked up by file name in that folder
+make eval-summary                              # tables for data/evaluation_results.csv
+```
+
+Settings live in `config/llm_listener_eval.json` (`model`, `workers`, `max_retries`, `cache_dir`). Answers are
+cached in `data/llm_listener_cache/`, keyed by each clip's audio hash, so a stopped run picks up where it left off,
+and a regenerated clip is asked again. Change `PROMPT_VERSION` in `evaluation/llm_listening.py` when you edit the
+prompt. The summary (`data/llm_evaluation_summary/`) has accuracy by evaluator, generator, intensity and sound,
+confusion matrices, how often each distortion was heard as its source or target, and agreement between evaluators.
+
 ## Tests
 
 ```bash

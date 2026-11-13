@@ -55,8 +55,9 @@ def crop_to_onset(pcm: bytes, rate: int, keep_s: float = 1.8) -> bytes:
     return y.astype(np.int16).tobytes()
 
 
-def prep_clip(source: Path, target: Path, seed: int = 0) -> None:
-    """tools.py prep: 16 kHz mono, silence trimmed (-40 dB, 80 ms margin), peak 0.8, centred in 2.5 s of -60 dBFS noise."""
+def prep_clip(source: Path, target: Path, seed: int = 0, pad_to_seconds: float | None = 2.5) -> None:
+    """tools.py prep: 16 kHz mono, silence trimmed (-40 dB, 80 ms margin), peak 0.8, centred in pad_to_seconds of
+    -60 dBFS noise. With pad_to_seconds=None there is no padding or added noise: the clip is just the trimmed sound."""
     sr = CLIP_SAMPLE_RATE
     audio = np.frombuffer(_ffmpeg(["-i", str(source), "-ac", "1", "-ar", str(sr), "-f", "f32le", "-"]), dtype=np.float32)
 
@@ -71,21 +72,25 @@ def prep_clip(source: Path, target: Path, seed: int = 0) -> None:
             audio = audio[max(active[0] * frame - margin, 0) : min((active[-1] + 1) * frame + margin, len(audio))]
 
     sound = audio / (np.abs(audio).max() or 1.0) * 0.8
-    total = max(int(2.5 * sr), len(sound))
-    clip = np.random.default_rng(seed).normal(0.0, 10 ** (-60.0 / 20), size=total).astype(np.float32)
-    start = (total - len(sound)) // 2
-    clip[start : start + len(sound)] += sound
+    if pad_to_seconds is None:
+        clip = sound
+    else:
+        total = max(int(pad_to_seconds * sr), len(sound))
+        clip = np.random.default_rng(seed).normal(0.0, 10 ** (-60.0 / 20), size=total).astype(np.float32)
+        start = (total - len(sound)) // 2
+        clip[start : start + len(sound)] += sound
     save_wav(target, (np.clip(clip, -1.0, 1.0) * 32767).astype(np.int16).tobytes(), sr)
 
 
 def save_raw_and_prepped(pcm: bytes, rate: int, target: Path) -> bool:
     """Saves the model's answer to raw/<name> next to target and the prepped clip to target. Answers over 3 s are cropped
-    first (the crop is kept as raw/<stem>_crop.wav). Returns whether it was cropped."""
+    first (the crop is kept as raw/<stem>_crop.wav). The prepped clip is the trimmed
+    sound only, without the 2.5 s noise padding. Returns whether it was cropped."""
     raw = target.parent / "raw" / target.name
     save_wav(raw, pcm, rate)
     source, cropped = raw, seconds(pcm, rate) > 3.0
     if cropped:
         source = raw.with_name(f"{target.stem}_crop.wav")
         save_wav(source, crop_to_onset(pcm, rate), rate)
-    prep_clip(source, target)
+    prep_clip(source, target, pad_to_seconds=None)
     return cropped
