@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class GeminiConfig(BaseModel):
-    project: str  # GCP project for Vertex AI
+    env_file: Path = Path(".env")
     location: str  # Vertex AI region, e.g. us-central1
     model: str
     voices: list[str]

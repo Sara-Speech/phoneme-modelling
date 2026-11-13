@@ -13,6 +13,7 @@ from phoneme_modelling.evaluation.evaluators.zipa import ZipaEvaluator
 from phoneme_modelling.schema.phoneme_evaluation import PhonemeEvaluationOutput
 from phoneme_modelling.schema.phoneme_pipeline_config import PhonemePipelineConfig
 from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
+from phoneme_modelling.util.loaders import load_audio_metadata
 
 
 class AudioEvaluationPipeline():
@@ -37,7 +38,7 @@ class AudioEvaluationPipeline():
         if evaluator_configs is None:
             return
         evaluators = cls.build_evaluators(evaluator_configs)
-        audio_metadata: list[dict] = pd.read_csv(audio_metadata_file_path).to_dict(orient="records")
+        audio_metadata: list[dict] = load_audio_metadata(audio_metadata_file_path)
         for audio_dict in audio_metadata:
             audio_info = SyntheticPhonemeMetadata.model_validate(audio_dict)
             audio_path = Path(audio_info.file_path)

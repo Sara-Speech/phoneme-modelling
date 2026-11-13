@@ -27,6 +27,11 @@ class AudioDistorter(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def get_type(self) -> str:
+        """Returns distortion type for metadata."""
+        raise NotImplementedError()
+
+    @abstractmethod
     def distort(
         self, 
         original_file_path: Path,
@@ -34,7 +39,7 @@ class AudioDistorter(ABC):
         original_phoneme_ipa: str,
         distortion_intensity: float,
         distorted_file_path: Path,
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, Optional[str], Optional[str]]:
         """
         Applies distortion to original audio with desired intensity and saves distorted audio to new file, returning 
         true if successful or false if the audio was rejected and optionally the ipa representation for the distorted

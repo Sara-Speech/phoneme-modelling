@@ -9,6 +9,7 @@ from phoneme_modelling.distortion.distorters.debug import DebugDistorter
 from phoneme_modelling.distortion.distorter import AudioDistorter
 from phoneme_modelling.distortion.distorter_factory import AudioDistorterFactory
 from phoneme_modelling.distortion.pair_registry import PAIR_DISTORTERS
+from phoneme_modelling.phonemes import IPA_TO_TEXT
 from phoneme_modelling.schema.phoneme_pipeline_config import DistortionApplicationConfig, PhonemePipelineConfig
 from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 from phoneme_modelling.util.audio_inspector import AudioInspector
@@ -40,7 +41,9 @@ class AudioDistortionPipeline():
             return
         distorters = cls.build_distorters(distorter_configs)
         number_of_digits = pipeline_config.number_of_digits
-        audio_metadata: list[dict] = pd.read_csv(audio_metadata_file_path).to_dict(orient="records")
+        dataframe = pd.read_csv(audio_metadata_file_path).astype("object")
+        dataframe = dataframe.where(pd.notna(dataframe), None)
+        audio_metadata: list[dict] = dataframe.where(pd.notnull(dataframe), None).to_dict(orient="records")
         for audio_dict in audio_metadata:
             audio_info = SyntheticPhonemeMetadata.model_validate(audio_dict)
             current_audio_count, metadatas = cls.__generate_distortions_for_audio(
@@ -68,6 +71,8 @@ class AudioDistortionPipeline():
     ) -> tuple[int, list[SyntheticPhonemeMetadata]]:
         original_file_path = Path(audio_info.file_path)
         if not original_file_path.is_file():
+            return current_audio_count, []
+        if audio_info.distortion_intensity > 0:
             return current_audio_count, []
         generated_metadata = []
         original_phoneme_text = audio_info.actual_phoneme_text
@@ -149,9 +154,12 @@ class AudioDistortionPipeline():
         target_file_name = cls.__build_file_name(distorter, audio_info, sound_number, intensity_number)
         target_file_path = Path(os.path.join(target_folder, target_file_name))
         has_generated = False
+        distorted_text = original_phoneme_text
         distorted_ipa = None
+        distorted_to_text = None
+        distorted_to_ipa = None
         for _ in retry_mechanism.attempts(target_file_path):
-            has_generated, distorted_ipa = distorter.distort(
+            has_generated, distorted_ipa, distorted_to_ipa = distorter.distort(
                 original_file_path=original_file_path,
                 original_phoneme_text=original_phoneme_text,
                 original_phoneme_ipa=original_phoneme_ipa,
@@ -164,6 +172,9 @@ class AudioDistortionPipeline():
             return False, None
         if distorted_ipa is None:
             distorted_ipa = original_phoneme_ipa
+        distorted_text = IPA_TO_TEXT[distorted_ipa]
+        if distorted_to_ipa is not None:
+            distorted_to_text = IPA_TO_TEXT[distorted_to_ipa]
         inspected_info = AudioInspector.get_info(target_file_path)
         metadata = SyntheticPhonemeMetadata(
             file_name=target_file_name,
@@ -171,9 +182,12 @@ class AudioDistortionPipeline():
             model=audio_info.model,
             voice=audio_info.voice,
             target_phoneme_text=audio_info.target_phoneme_text,
-            actual_phoneme_text=original_phoneme_text,
+            actual_phoneme_text=distorted_text,
             actual_phoneme_ipa=distorted_ipa,
             distortion_intensity=intensity,
+            distortion_type=distorter.get_type(),
+            distortion_phoneme_text=distorted_to_text,
+            distortion_phoneme_ipa=distorted_to_ipa,
             duration=inspected_info.duration
         )
         return has_generated, metadata

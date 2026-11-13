@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -11,4 +13,7 @@ class SyntheticPhonemeMetadata(BaseModel):
     actual_phoneme_text: str
     actual_phoneme_ipa: str
     distortion_intensity: float
+    distortion_type: Optional[str] = None
+    distortion_phoneme_text: Optional[str] = None
+    distortion_phoneme_ipa: Optional[str] = None
     duration: float

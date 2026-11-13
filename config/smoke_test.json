@@ -15,11 +15,12 @@
         "interrupt_generation_on_short_audio": false,
         "max_audio_length": 10.0,
         "interrupt_generation_on_long_audio": false,
+        "min_volume_rms": 500.0,
+        "interrupt_generation_on_faint_audio": false,
         "max_number_of_retries": 3
     },
     "generator_configs": {
         "gemini": {
-            "project": "capstone-510119",
             "location": "us-central1",
             "model": "gemini-3.8-live",
             "voices": [
@@ -37,7 +38,6 @@
             "prompts_file": "config/prompts.csv"
         },
         "google_tts": {
-            "project": "capstone-510119",
             "voices": [
                 "en-US-Neural2-F"
             ]

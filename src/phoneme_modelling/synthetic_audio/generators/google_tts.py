@@ -6,6 +6,7 @@ Needs Application Default Credentials (``gcloud auth application-default login``
 Colab) for a project with the Cloud Text-to-Speech API enabled.
 """
 import io
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -17,6 +18,7 @@ from phoneme_modelling.schema.google_tts_config import GoogleTTSConfig
 from phoneme_modelling.synthetic_audio.generation import SyntheticAudioGenerationVoice, SyntheticAudioGenerator
 from phoneme_modelling.synthetic_audio.google_tts_sounds import GOOGLE_TTS_SOUNDS, HOLD
 from phoneme_modelling.util.audio import prep_clip, save_wav, seconds
+from phoneme_modelling.util.env import load_env
 from phoneme_modelling.util.forced_alignment import ALIGNER_SAMPLE_RATE, PhoneAligner
 
 
@@ -123,7 +125,9 @@ class GoogleTTSGenerator(SyntheticAudioGenerator):
 
     def _init_voices(self) -> list[SyntheticAudioGenerationVoice]:
         config = self.config
-        client = texttospeech.TextToSpeechClient(client_options={"quota_project_id": config.project})
+        load_env(config.env_file)
+        gcp_project = os.environ.get("GCP_PROJECT")
+        client = texttospeech.TextToSpeechClient(client_options={"quota_project_id": gcp_project})
         aligner = PhoneAligner()
         takes = len(config.hold_repeats)
         return [

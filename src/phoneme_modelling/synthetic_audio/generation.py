@@ -6,6 +6,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from phoneme_modelling.distortion.types import DistortionType
 from phoneme_modelling.phonemes import TEXT_TO_IPA, VALID_IPA_STRINGS, VALID_SOUND_TEXTS
 from phoneme_modelling.schema.phoneme_distortion import PhonemeDistortionRequest
 from phoneme_modelling.schema.phoneme_pipeline_config import PhonemePipelineConfig, PhonemeValidationConfig
@@ -52,9 +53,9 @@ class SyntheticAudioGenerationVoice(ABC):
             distort_to_text=distort_to_text,
             distort_to_ipa=distort_to_ipa
         )
-        has_attempted_generation = False
+        # A failed attempt (no file, or a file that fails validation) is retried until the retry budget runs out.
         for _ in retry_mechanism.attempts(target_file_path):
-            has_attempted_generation = self._generate_audio(
+            self._generate_audio(
                 target_file_path=target_file_path,
                 text=text,
                 ipa=ipa,
@@ -62,8 +63,6 @@ class SyntheticAudioGenerationVoice(ABC):
                 distort_to_text=distort_to_text,
                 distort_to_ipa=distort_to_ipa
             )
-            if not has_attempted_generation:
-                return False
         return retry_mechanism.is_success(target_file_path)
 
     def __validate_audio_generation_input(
@@ -224,9 +223,14 @@ class SyntheticAudioGenerator(ABC):
                 if has_generated_file:
                     current_audio_count += 1
                     dominant_phoneme_text = from_phoneme
+                    dominant_phoneme_ipa = from_phoneme_ipa
+                    nondominant_phoneme_text = to_phoneme
+                    nondominant_phoneme_ipa = to_phoneme_ipa
                     if distortion_intensity > 0.5:
                         dominant_phoneme_text = to_phoneme
-                    distortion_ipa = f"distortion[{from_phoneme_ipa}({from_percentage}%)|{to_phoneme_ipa}({to_percentage}%)]"
+                        dominant_phoneme_ipa = to_phoneme_ipa
+                        nondominant_phoneme_text = from_phoneme
+                        nondominant_phoneme_ipa = from_phoneme_ipa
                     audio_info = AudioInspector.get_info(sound_file_path)
                     generated_audio_info = SyntheticPhonemeMetadata(
                         file_name=sound_file_name,
@@ -235,8 +239,11 @@ class SyntheticAudioGenerator(ABC):
                         voice=voice.get_voice_nickname(),
                         target_phoneme_text=from_phoneme,
                         actual_phoneme_text=dominant_phoneme_text,
-                        actual_phoneme_ipa=distortion_ipa,
+                        actual_phoneme_ipa=dominant_phoneme_ipa,
                         distortion_intensity=distortion_intensity,
+                        distortion_type=DistortionType.TOWARDS_PHONEME.value,
+                        distortion_phoneme_text=nondominant_phoneme_text,
+                        distortion_phoneme_ipa=nondominant_phoneme_ipa,
                         duration=audio_info.duration
                     )
                     generated_metadata.append(generated_audio_info)
