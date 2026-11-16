@@ -57,14 +57,6 @@
             "takes": 1,
             "ref_dir": "inputs/reference_recordings"
         },
-        "openai": {
-            "model": "gpt-realtime-2.1",
-            "voices": ["alloy", "ash", "ballad", "cedar", "coral", "echo", "marin", "sage", "shimmer", "verse"],
-            "min_peak": 0.05,
-            "prompts_file": "config/prompts.csv",
-            "takes": 1,
-            "ref_dir": "inputs/reference_recordings"
-        },
         "google_tts": {
             "voices": [
                 "en-US-Neural2-A", "en-US-Neural2-C", "en-US-Neural2-D", "en-US-Neural2-E", "en-US-Neural2-F",

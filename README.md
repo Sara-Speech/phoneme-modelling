@@ -22,10 +22,8 @@ Settings live in `config/default.json`.
    * Enable the **Agent Platform API** and the **Cloud Text-to-Speech API** in your GCP project[cite: 4].
 
 2. **Environment Variables:**
-   * Retrieve the OpenAI API key from the AWS Secrets Manager: [openai_content_gen](https://381492152880-dopmmgh3.us-east-2.console.aws.amazon.com/secretsmanager/secret?name=openai_content_gen&region=us-east-2&tab=overview#).
-   * Create a `.env` file in the root of the project with your OpenAI API key and GCP project ID[cite: 2]:
+   * Create a `.env` file in the root of the project with your GCP project ID:
      ```env
-     OPENAI_API_KEY=your_retrieved_aws_secret
      GCP_PROJECT=your_gcp_project_id
      ```
 
