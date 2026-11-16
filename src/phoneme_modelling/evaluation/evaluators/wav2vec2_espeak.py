@@ -5,6 +5,7 @@ import torch
 from pydantic import BaseModel
 from transformers import Wav2Vec2FeatureExtractor, Wav2Vec2ForCTC, Wav2Vec2PhonemeCTCTokenizer
 
+from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 from phoneme_modelling.util.ipa import clean_ipa
 from phoneme_modelling.util.loaders import load_as_numpy_array
 from phoneme_modelling.evaluation.evaluator import AudioEvaluator
@@ -30,14 +31,14 @@ class Wav2Vec2EspeakEvaluator(AudioEvaluator):
     def get_name() -> str:
         return "wav2vec2_espeak"
 
-    def evaluate(self, target_phoneme: str, target_phoneme_ipa: str, audio_path: Path) -> PhonemeEvaluation:
-        audio = load_as_numpy_array(audio_path, W2V2_ESPEAK_SAMPLE_RATE)
+    def evaluate(self, audio_info: SyntheticPhonemeMetadata) -> PhonemeEvaluation:
+        audio = load_as_numpy_array(audio_info.file_path, W2V2_ESPEAK_SAMPLE_RATE)
         with torch.no_grad():
             encodings = self.__feature_extractor(audio, sampling_rate=W2V2_ESPEAK_SAMPLE_RATE, return_tensors="pt")
             logits = self.__model(encodings.input_values).logits
             detected_ipa = self.__tokenizer.batch_decode(logits.argmax(-1))[0].strip()
         detected_ipa = clean_ipa(detected_ipa)
-        is_correct = detected_ipa == target_phoneme_ipa
+        is_correct = detected_ipa == audio_info.actual_phoneme_ipa
         detected_text = None
         if detected_ipa in IPA_TO_TEXT:
             detected_text = IPA_TO_TEXT.get(detected_ipa)

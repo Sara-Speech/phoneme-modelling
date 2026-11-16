@@ -45,11 +45,7 @@ class AudioEvaluationPipeline():
             if not audio_path.is_file():
                 continue
             for evaluator in evaluators:
-                result = evaluator.evaluate(
-                    target_phoneme=audio_info.actual_phoneme_text,
-                    target_phoneme_ipa=audio_info.actual_phoneme_ipa,
-                    audio_path=audio_path
-                )
+                result = evaluator.evaluate(audio_info)
                 output = PhonemeEvaluationOutput(
                     evaluation=evaluator.get_name(),
                     **audio_info.model_dump(),

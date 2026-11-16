@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from phoneme_modelling.evaluation.evaluator import AudioEvaluator
 from phoneme_modelling.schema.phoneme_evaluation import PhonemeEvaluation
+from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 
 
 
@@ -20,15 +21,15 @@ class DebugEvaluator(AudioEvaluator):
     def get_name() -> str:
         return "debug"
 
-    def evaluate(self, target_phoneme: str, target_phoneme_ipa: str, audio_path: Path) -> PhonemeEvaluation:
+    def evaluate(self, audio_info: SyntheticPhonemeMetadata) -> PhonemeEvaluation:
         debug_text = (
-            f"Running debug evaluator for target_phoneme: {target_phoneme}, target_phoneme_ipa: "
-            f"{target_phoneme_ipa}, audio_path: {audio_path}"
+            f"Running debug evaluator for target_phoneme: {audio_info.actual_phoneme_text}, target_phoneme_ipa: "
+            f"{audio_info.actual_phoneme_ipa}, audio_path: {audio_info.file_path}"
         )
         print(debug_text)
         return PhonemeEvaluation(
             is_correct=True,
-            detected_phoneme_text=target_phoneme, # Optional
-            detected_phoneme_ipa=target_phoneme_ipa, # Optional
+            detected_phoneme_text=audio_info.actual_phoneme_text, # Optional
+            detected_phoneme_ipa=audio_info.actual_phoneme_ipa, # Optional
             quality=0.9 # Optional
         )
