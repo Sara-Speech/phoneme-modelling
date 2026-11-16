@@ -14,7 +14,6 @@ dependencies = [
     "lhotse>=1.33.0",
     "librosa>=1.0.0",
     "onnxruntime>=1.31.1",
-    "openai>=3.46.0",
     "pandas>=3.1.0",
     "praat-parselmouth>=0.4.7",
     "pydantic>=2.14.1",
