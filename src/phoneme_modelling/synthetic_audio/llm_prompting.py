@@ -1,4 +1,4 @@
-"""Prompts used for LLM generation. Every take sends the phoneme's reference recording, then
+"""Prompts shared by the LLM generators (Gemini, OpenAI). Every take sends the phoneme's reference recording, then
 REF_INTRO and the phoneme's prompt from the prompts file."""
 from pathlib import Path
 
