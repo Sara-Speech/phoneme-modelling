@@ -29,6 +29,14 @@
             "ref_dir": "inputs/reference_recordings",
             "prompts_file": "config/prompts.csv"
         },
+        "openai": {
+            "model": "gpt-realtime-2.1",
+            "voices": [
+                "alloy"
+            ],
+            "ref_dir": "inputs/reference_recordings",
+            "prompts_file": "config/prompts.csv"
+        },
         "google_tts": {
             "voices": [
                 "en-US-Neural2-F"
