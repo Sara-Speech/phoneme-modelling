@@ -8,6 +8,7 @@ from huggingface_hub import hf_hub_download
 from lhotse.features.kaldi.extractors import Fbank, FbankConfig
 from pydantic import BaseModel
 
+from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 from phoneme_modelling.util.ipa import clean_ipa
 from phoneme_modelling.util.loaders import load_as_numpy_array
 from phoneme_modelling.evaluation.evaluator import AudioEvaluator
@@ -54,11 +55,11 @@ class ZipaEvaluator(AudioEvaluator):
             prev = i
         return " ".join(out)
 
-    def evaluate(self, target_phoneme: str, target_phoneme_ipa: str, audio_path: Path) -> PhonemeEvaluation:
-        audio = load_as_numpy_array(audio_path, ZIPA_SAMPLE_RATE)
+    def evaluate(self, audio_info: SyntheticPhonemeMetadata) -> PhonemeEvaluation:
+        audio = load_as_numpy_array(audio_info.file_path, ZIPA_SAMPLE_RATE)
         detected_ipa = self.get_audio_ipa(audio)
         detected_ipa = clean_ipa(detected_ipa)
-        is_correct = detected_ipa == target_phoneme_ipa
+        is_correct = detected_ipa == audio_info.actual_phoneme_ipa
         detected_text = None
         if detected_ipa in IPA_TO_TEXT:
             detected_text = IPA_TO_TEXT.get(detected_ipa)

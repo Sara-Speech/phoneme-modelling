@@ -54,5 +54,9 @@
         "th_voiced_to_th_voiceless_matched": null,
         "m_to_n": null,
         "m_to_n_matched": null
+    },
+    "evaluator_configs": {
+        "wav2vec2": null,
+        "zipa": null
     }
 }

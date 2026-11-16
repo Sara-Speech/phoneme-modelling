@@ -22,3 +22,6 @@ class PhonemeEvaluationOutput(BaseModel):
     detected_phoneme_text: Optional[str] = None
     detected_phoneme_ipa: Optional[str] = None
     quality: Optional[float] = None
+    model: str
+    voice: str
+    is_distorted: bool = False
