@@ -44,10 +44,12 @@ Every pair has two versions:
 
 Each distortion is made at three strengths, set by `distortion_application_config.distortion_intensitites`:
 
-- **0.3** goes about 30% of the way from the correct sound to the mistake: a slight version of the mistake. Its
-  metadata keeps the correct sound as `actual_phoneme_text`, because the edit is under halfway.
+- **0.3** goes about 30% of the way from the correct sound to the mistake: a slight version of the mistake.
 - **0.6** goes about 60% of the way.
 - **1** goes all the way.
+
+Every strength is labelled the same way: `actual_phoneme_text` is the mistake (e.g. w), `distortion_phoneme_text`
+is the correct sound (r), and `distortion_intensity` says how far the edit went (0.3, 0.6 or 1).
 
 Any other strength is skipped. There is no strength 0: an unedited copy would only duplicate the clean clip, and the
 clean clips are already the "correct" examples.

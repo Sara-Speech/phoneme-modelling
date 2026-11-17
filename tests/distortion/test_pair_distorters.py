@@ -87,9 +87,9 @@ def test_makes_a_standard_clip(
     assert rate == RATE
     assert len(samples) >= seconds(2.5)
     assert np.isfinite(samples).all()
-    # The label is the sound the clip is closer to: the target sound past halfway, the original sound below it.
+    # Every strength is labelled as the mistake; the strength itself is kept in distortion_intensity.
     from_ipa, to_ipa = TEXT_TO_IPA[distorter.FROM_PHONEME], TEXT_TO_IPA[distorter.TO_PHONEME]
-    assert (ipa, other_ipa) == ((to_ipa, from_ipa) if intensity > 0.5 else (from_ipa, to_ipa))
+    assert (ipa, other_ipa) == (to_ipa, from_ipa)
 
 
 @pytest.mark.parametrize("distorter_class", PAIR_DISTORTERS, ids=lambda cls: cls.get_name())
@@ -233,6 +233,5 @@ def test_pipeline_makes_every_strength_and_skips_other_sounds(sound_files: dict[
     assert set(made["target_phoneme_text"]) == {"r"}
     assert sorted(made["distortion_intensity"]) == [0.3, 0.3, 0.6, 0.6, 1.0, 1.0]
     assert (made["file_name"].str.contains("r_to_w_matched")).sum() == 3
-    slight = made["distortion_intensity"] < 0.5
-    assert set(made.loc[slight, "actual_phoneme_text"]) == {"r"}  # under halfway it is still labelled r
-    assert set(made.loc[~slight, "actual_phoneme_text"]) == {"w"}
+    assert set(made["actual_phoneme_text"]) == {"w"}  # 0.3 too is labelled as the mistake, not as r
+    assert set(made["distortion_phoneme_text"]) == {"r"}

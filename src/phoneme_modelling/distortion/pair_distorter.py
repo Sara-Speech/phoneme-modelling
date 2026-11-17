@@ -132,14 +132,11 @@ class PairDistorter(AudioDistorter):
         return self.__voice_f0.get(voice_of(seed_name), DEFAULT_F0)
 
     def __distorted_ipa(self, distortion_intensity: float) -> str:
-        if distortion_intensity > 0.5:
-            return TEXT_TO_IPA[self.TO_PHONEME]
-        return TEXT_TO_IPA[self.FROM_PHONEME]
+        """Every edited clip is labelled as the mistake; how far it went is its ``distortion_intensity`` (0.3, 0.6, 1)."""
+        return TEXT_TO_IPA[self.TO_PHONEME]
 
     def __distorted_to_ipa(self, distortion_intensity: float) -> str:
-        if distortion_intensity > 0.5:
-            return TEXT_TO_IPA[self.FROM_PHONEME]
-        return TEXT_TO_IPA[self.TO_PHONEME]
+        return TEXT_TO_IPA[self.FROM_PHONEME]
 
     def __match_nuisance(
         self, natural: np.ndarray, seed_name: str, distortion_intensity: float
