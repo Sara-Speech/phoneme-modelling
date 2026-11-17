@@ -42,16 +42,19 @@ Every pair has two versions:
 - **Matched** (`r_to_w_matched`): the same distortion, with the length, pitch and loudness of a correct clip of the
   same sound, so a model can't use those to tell errors from correct clips.
 
-Each distortion is made at two strengths, set by `distortion_application_config.distortion_intensitites`:
+Each distortion is made at three strengths, set by `distortion_application_config.distortion_intensitites`:
 
-- **0.6** goes about 60% of the way from the correct sound to the mistake.
+- **0.3** goes about 30% of the way from the correct sound to the mistake: a slight version of the mistake. Its
+  metadata keeps the correct sound as `actual_phoneme_text`, because the edit is under halfway.
+- **0.6** goes about 60% of the way.
 - **1** goes all the way.
 
 Any other strength is skipped. There is no strength 0: an unedited copy would only duplicate the clean clip, and the
 clean clips are already the "correct" examples.
 
 The numbers each pair uses are saved in `config/distortion/`, one file per pair. They were measured on the 2026-10-25
-clean clips by `scripts/export_pair_parameters.py` in `phoneme-endpoint`.
+clean clips by `scripts/export_pair_parameters.py` in `phoneme-endpoint`. The 0.6 and 1 settings are that study's
+severity 3 and 5. The 0.3 setting is read off the same calibration curve, at 30% of the way.
 
 ### Pairs
 

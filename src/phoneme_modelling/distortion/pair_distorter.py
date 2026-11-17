@@ -20,7 +20,7 @@ from phoneme_modelling.util.loaders import load_as_numpy_array
 
 PARAMETERS_FOLDER = Path(__file__).resolve().parents[3] / "config" / "distortion"
 DEFAULT_F0 = 150.0
-INTENSITIES = (0.6, 1.0)
+INTENSITIES = (0.3, 0.6, 1.0)
 DURATION_JITTER = 0.1
 LEVEL_JITTER_DB = 2.0
 MIN_GAIN_DB = -30.0
@@ -77,8 +77,8 @@ class PairDistorter(AudioDistorter):
         return DistortionType.TOWARDS_PHONEME.value
 
     def alpha_for(self, distortion_intensity: float) -> Optional[float]:
-        """Calibrated edit strength: 0.6 reaches 60% of the natural difference between the two sounds, 1 all of it.
-        None for a strength that is not in INTENSITIES."""
+        """Calibrated edit strength: 0.3 reaches 30% of the natural difference between the two sounds, 0.6 reaches 60%,
+        1 all of it. None for a strength that is not in INTENSITIES."""
         for intensity, alpha in self.parameters.intensity_alpha.items():
             if np.isclose(distortion_intensity, intensity) and np.isclose(INTENSITIES, intensity).any():
                 return float(alpha)
