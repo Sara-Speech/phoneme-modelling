@@ -57,8 +57,8 @@ class ZipaEvaluator(AudioEvaluator):
 
     def evaluate(self, audio_info: SyntheticPhonemeMetadata) -> PhonemeEvaluation:
         audio = load_as_numpy_array(audio_info.file_path, ZIPA_SAMPLE_RATE)
-        detected_ipa = self.get_audio_ipa(audio)
-        detected_ipa = clean_ipa(detected_ipa)
+        detected_raw = self.get_audio_ipa(audio)
+        detected_ipa = clean_ipa(detected_raw)
         is_correct = detected_ipa == audio_info.actual_phoneme_ipa
         detected_text = None
         if detected_ipa in IPA_TO_TEXT:
@@ -67,4 +67,5 @@ class ZipaEvaluator(AudioEvaluator):
             is_correct=is_correct,
             detected_phoneme_text=detected_text,
             detected_phoneme_ipa=detected_ipa,
+            detected_raw=detected_raw
         )

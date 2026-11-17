@@ -14,6 +14,23 @@ resolution-markers = [
 ]
 
 [[package]]
+name = "allosaurus"
+version = "1.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "editdistance" },
+    { name = "numpy" },
+    { name = "panphon" },
+    { name = "resampy" },
+    { name = "scipy" },
+    { name = "torch" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ef/15/7e8aa355707f1d3f849380f1e6c9a4bceb6caf64bf633cffdf6fe5acfba2/allosaurus-1.0.2.tar.gz", hash = "sha256:631a873fb6ba86063811c8d6a8d4aa777110ca90d222eae49b83fa27798c18f3", size = 46493, upload-time = "2021-09-02T19:28:06.39Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/85/3ef1d2f70736bef5650c7fedbf4d4e01efe728f10bad0294a9a8d396ff00/allosaurus-1.0.2-py3-none-any.whl", hash = "sha256:70f2bc3f8258be5538bed2e5066d1fa248005bc4a36599e1606f953fc9abfc0a", size = 52088, upload-time = "2021-09-02T19:28:04.034Z" },
+]
+
+[[package]]
 name = "annotated-doc"
 version = "0.0.5"
 source = { registry = "https://pypi.org/simple" }
@@ -620,6 +637,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527
 wheels = [
     { url = "https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2", size = 20277, upload-time = "2023-12-24T09:54:30.421Z" },
 ]
+
+[[package]]
+name = "editdistance"
+version = "0.8.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/18/9f4f975ca87a390832b1c22478f3702fcdf739f83211e24d054b7551270d/editdistance-0.8.1.tar.gz", hash = "sha256:d1cdf80a5d5014b0c9126a69a42ce55a457b457f6986ff69ca98e4fe4d2d8fed", size = 50006, upload-time = "2024-02-10T07:44:53.914Z" }
 
 [[package]]
 name = "filelock"
@@ -1323,6 +1346,22 @@ wheels = [
 ]
 
 [[package]]
+name = "munkres"
+version = "3.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/e4/c5cc64941985d8f9fc0291ebf88329709f4df44f745e8e8c999c6e19e03f/munkres-3.0.0.tar.gz", hash = "sha256:21f8a04bc28b34bbefc35d4af824b3d70de2f3d37d655da0a1474e5c2ba341bf", size = 252231, upload-time = "2026-10-18T13:46:56.855Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/b7/a01b728af3b7da660fbd28573ca701839b1a0f1bae04419656f527b8c7ed/munkres-3.0.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:cec2e46861dfdc78eb7c8eba5802149be2094dfbede34f5a684bd1a63c6354df", size = 144652, upload-time = "2026-10-18T13:46:45.905Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/76/4a1b360f1c6c4393d05f4b99fd951afb49701af65dee4792497783025a0f/munkres-3.0.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:18bf78633fa59dbe1149f93b3540d089082e7c79fa14525dee40cd72f8424651", size = 174468, upload-time = "2026-10-18T13:46:47.188Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/78/34e7c0fa9203da817f64013272cc2d0f695a8e621df1073acc163c2e76fe/munkres-3.0.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:b34e9fb1087f1fae95df86e5633356eba9fe4ad08d5f05eebe3db5531342ab55", size = 174347, upload-time = "2026-10-18T13:46:48.557Z" },
+    { url = "https://files.pythonhosted.org/packages/63/ed/34b5415665ec31a909ccb22af1e6adae8d105c03153225946ae96a347243/munkres-3.0.0-cp313-cp313-win_amd64.whl", hash = "sha256:37decfb54951719bc17034ac08287e5b30be80f760cc559804073e3b06d1ddcc", size = 136375, upload-time = "2026-10-18T13:46:49.898Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/05/7720547fea38168acad07826a043bc77ee7d1aa5b30f727eec3ee7dda9e1/munkres-3.0.0-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:fafe62e13287d4659e6d9f7158f526e6f57b957d231b0d711e1d95bcbcbbd657", size = 145267, upload-time = "2026-10-18T13:46:51.224Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/04/639a2708bc365204bf6baa05353378972656a09d748bae8a2d4deccbae43/munkres-3.0.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:afc2264030a502183f97caa5becc4bf66bd5a0cd1d6dfd38812349ccc8486461", size = 174581, upload-time = "2026-10-18T13:46:52.793Z" },
+    { url = "https://files.pythonhosted.org/packages/40/c6/fafd245e393b342c98dcec42bdf8d450639f4d4a60c6950f692ccd8d53e4/munkres-3.0.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:317eca8558e175cc21d14dec71ffc648214826f0469366fcecc0977370c84506", size = 174477, upload-time = "2026-10-18T13:46:54.109Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/80/289c7a43d7a027a85e4d9ca65dd97d07ed773f0665c7e5844b37e812cd56/munkres-3.0.0-cp314-cp314-win_amd64.whl", hash = "sha256:9d7a30a12a3ee6bc1f7cdf3d76d9426bd92eaeba696d175d9ee5d40de0af0e76", size = 136829, upload-time = "2026-10-18T13:46:55.522Z" },
+]
+
+[[package]]
 name = "narwhals"
 version = "2.27.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1703,10 +1742,30 @@ wheels = [
 ]
 
 [[package]]
+name = "panphon"
+version = "0.22.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "editdistance" },
+    { name = "munkres" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pyyaml" },
+    { name = "regex" },
+    { name = "setuptools" },
+    { name = "unicodecsv" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fe/00/846bf96c41a5dcc2ead957ac7229931c456091735c73d98454ad3c109931/panphon-0.22.2.tar.gz", hash = "sha256:383d477d587feba1ca5a82878e24fe77c1645d6fbe9e01c9e97d498d8a29ba35", size = 79244, upload-time = "2025-06-12T22:23:05.173Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/72/2a/05a47a6c291414f5a66901f8d1f6ba68e8ec9fccb341d56fa0b31479d41d/panphon-0.22.2-py2.py3-none-any.whl", hash = "sha256:a4c65113430d0699054cb00df978c02712d3c80913a1ef67697f888d96f3a00a", size = 78888, upload-time = "2025-06-12T22:23:04.272Z" },
+]
+
+[[package]]
 name = "phoneme-modelling"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "allosaurus" },
     { name = "certifi" },
     { name = "google-cloud-texttospeech" },
     { name = "google-genai" },
@@ -1731,6 +1790,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "allosaurus", specifier = ">=1.0.2" },
     { name = "certifi", specifier = ">=2026.10.23" },
     { name = "google-cloud-texttospeech", specifier = ">=2.38.0" },
     { name = "google-genai", specifier = ">=2.33.0" },
@@ -2144,6 +2204,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ac/c3/e2a2b89f2d3e2179abd6d00ebd70bff6273f37fb3e0cc209f48b39d00cbf/requests-2.34.2.tar.gz", hash = "sha256:f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed", size = 142856, upload-time = "2026-05-14T19:25:27.735Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl", hash = "sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0", size = 73075, upload-time = "2026-05-14T19:25:26.443Z" },
+]
+
+[[package]]
+name = "resampy"
+version = "0.4.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numba" },
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/29/f1/34be702a69a5d272e844c98cee82351f880985cfbca0cc86378011078497/resampy-0.4.3.tar.gz", hash = "sha256:a0d1c28398f0e55994b739650afef4e3974115edbe96cd4bb81968425e916e47", size = 3080604, upload-time = "2024-03-05T20:36:08.119Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/b9/3b00ac340a1aab3389ebcc52c779914a44aadf7b0cb7a3bf053195735607/resampy-0.4.3-py3-none-any.whl", hash = "sha256:ad2ed64516b140a122d96704e32bc0f92b23f45419e8b8f478e5a05f83edcebd", size = 3076529, upload-time = "2024-03-05T20:36:02.439Z" },
 ]
 
 [[package]]
@@ -2650,6 +2723,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/d9/68/f1b440335057bfce7
 wheels = [
     { url = "https://files.pythonhosted.org/packages/94/21/1e5995a1c920cce14e4bffae20c665ec10e7ed03ab25e006cd741092b718/tzdata-2026.5-py2.py3-none-any.whl", hash = "sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac", size = 347996, upload-time = "2026-10-03T09:23:12.535Z" },
 ]
+
+[[package]]
+name = "unicodecsv"
+version = "0.14.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/a4/691ab63b17505a26096608cc309960b5a6bdf39e4ba1a793d5f9b1a53270/unicodecsv-0.14.1.tar.gz", hash = "sha256:018c08037d48649a0412063ff4eda26eaa81eff1546dbffa51fa5293276ff7fc", size = 10267, upload-time = "2015-09-22T22:00:19.516Z" }
 
 [[package]]
 name = "urllib3"
