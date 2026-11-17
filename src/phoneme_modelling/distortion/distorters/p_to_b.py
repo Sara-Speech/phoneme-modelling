@@ -6,7 +6,8 @@ from phoneme_modelling.util.acoustics.clip import Clip
 
 
 class PToBDistorter(PairDistorter):
-    """p said as b: adds prevoicing and cuts the release toward b. Burst place stays, it barely differs."""
+    """p said as b: adds prevoicing and cuts the release toward b, with targets fitted on 2026-11-15 so strength 1 of
+    Fenrir's p (10-25 take 1) measures like Fenrir's own b (85 ms prevoicing, 19 ms release). Burst place stays."""
 
     FROM_PHONEME = "p"
     TO_PHONEME = "b"
