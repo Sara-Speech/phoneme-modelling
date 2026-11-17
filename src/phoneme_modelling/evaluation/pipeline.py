@@ -4,6 +4,7 @@ import pandas as pd
 from pandas import DataFrame
 from pathlib import Path
 
+from phoneme_modelling.evaluation.evaluators.allosaurus import AllosaurusEvaluator
 from phoneme_modelling.evaluation.evaluators.debug import DebugEvaluator
 from phoneme_modelling.evaluation.evaluator import AudioEvaluator
 from phoneme_modelling.evaluation.evaluator_factory import AudioEvaluatorFactory
@@ -24,6 +25,7 @@ class AudioEvaluationPipeline():
         factory.register(Wav2Vec2Evaluator, None)
         factory.register(Wav2Vec2EspeakEvaluator, None)
         factory.register(ZipaEvaluator, None)
+        factory.register(AllosaurusEvaluator, None)
         return factory.generate(configs)
 
     @classmethod
