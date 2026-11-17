@@ -14,7 +14,7 @@ def load_as_numpy_array_with_sample_rate(file_path: Path|str) -> tuple[np.ndarra
     audio, sample_rate = librosa.load(file_path, sr=None, mono=True)
     return audio, sample_rate
 
-def load_audio_metadata(file_path: Path) -> list[dict]:
+def load_csv_metadata(file_path: Path) -> list[dict]:
     dataframe = pd.read_csv(file_path).astype("object")
     dataframe = dataframe.where(pd.notna(dataframe), None)
     return dataframe.where(pd.notnull(dataframe), None).to_dict(orient="records")

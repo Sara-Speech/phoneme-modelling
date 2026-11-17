@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from phoneme_modelling.schema.phoneme_evaluation import PhonemeEvaluation
+from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 
 
 
@@ -19,6 +20,6 @@ class AudioEvaluator(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def evaluate(self, target_phoneme: str, target_phoneme_ipa: str, audio_path: Path) -> PhonemeEvaluation:
+    def evaluate(self, audio_info: SyntheticPhonemeMetadata) -> PhonemeEvaluation:
         raise NotImplementedError()
     
