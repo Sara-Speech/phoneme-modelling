@@ -36,8 +36,8 @@ class Wav2Vec2EspeakEvaluator(AudioEvaluator):
         with torch.no_grad():
             encodings = self.__feature_extractor(audio, sampling_rate=W2V2_ESPEAK_SAMPLE_RATE, return_tensors="pt")
             logits = self.__model(encodings.input_values).logits
-            detected_ipa = self.__tokenizer.batch_decode(logits.argmax(-1))[0].strip()
-        detected_ipa = clean_ipa(detected_ipa)
+            detected_raw = self.__tokenizer.batch_decode(logits.argmax(-1))[0].strip()
+        detected_ipa = clean_ipa(detected_raw)
         is_correct = detected_ipa == audio_info.actual_phoneme_ipa
         detected_text = None
         if detected_ipa in IPA_TO_TEXT:
@@ -46,4 +46,5 @@ class Wav2Vec2EspeakEvaluator(AudioEvaluator):
             is_correct=is_correct,
             detected_phoneme_text=detected_text,
             detected_phoneme_ipa=detected_ipa,
+            detected_raw=detected_raw
         )

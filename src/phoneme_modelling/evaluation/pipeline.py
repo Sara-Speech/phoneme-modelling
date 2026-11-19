@@ -3,6 +3,8 @@ from typing import Any
 from pandas import DataFrame
 from pathlib import Path
 
+from phoneme_modelling.evaluation.evaluators.allosaurus import AllosaurusEvaluator
+from phoneme_modelling.evaluation.evaluators.debug import DebugEvaluator
 from phoneme_modelling.evaluation.evaluator import AudioEvaluator
 from phoneme_modelling.evaluation.evaluator_factory import AudioEvaluatorFactory
 from phoneme_modelling.evaluation.evaluators.gemini_listener import GeminiListenerEvaluator
@@ -27,6 +29,7 @@ class AudioEvaluationPipeline():
         factory.register(ZipaEvaluator, None)
         factory.register(GeminiListenerEvaluator, GeminiListenerConfig)
         factory.register(OpenAIListenerEvaluator, LLMListenerConfig)
+        factory.register(AllosaurusEvaluator, None)
         return factory.generate(configs)
 
     @classmethod

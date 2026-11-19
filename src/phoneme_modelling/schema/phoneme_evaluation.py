@@ -8,6 +8,7 @@ class PhonemeEvaluation(BaseModel):
     is_correct: bool
     detected_phoneme_text: Optional[str] = None
     detected_phoneme_ipa: Optional[str] = None
+    detected_raw: Optional[str] = None
     quality: Optional[float] = None
 
 
@@ -21,6 +22,7 @@ class PhonemeEvaluationOutput(BaseModel):
     is_correct: bool
     detected_phoneme_text: Optional[str] = None
     detected_phoneme_ipa: Optional[str] = None
+    detected_raw: Optional[str] = None
     quality: Optional[float] = None
     model: str
     voice: str

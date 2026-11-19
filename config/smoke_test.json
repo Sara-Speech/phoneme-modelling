@@ -5,6 +5,7 @@
     ],
     "distortion_application_config": {
         "distortion_intensitites": [
+            0.3,
             0.6,
             1.0
         ]
@@ -57,6 +58,7 @@
     },
     "evaluator_configs": {
         "wav2vec2": null,
-        "zipa": null
+        "zipa": null,
+        "allosaurus": null
     }
 }
