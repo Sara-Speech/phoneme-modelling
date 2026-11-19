@@ -20,7 +20,7 @@ from phoneme_modelling.util.loaders import load_as_numpy_array
 
 PARAMETERS_FOLDER = Path(__file__).resolve().parents[3] / "config" / "distortion"
 DEFAULT_F0 = 150.0
-INTENSITIES = (0.6, 1.0)
+INTENSITIES = (0.3, 0.6, 1.0)
 DURATION_JITTER = 0.1
 LEVEL_JITTER_DB = 2.0
 MIN_GAIN_DB = -30.0
@@ -77,8 +77,8 @@ class PairDistorter(AudioDistorter):
         return DistortionType.TOWARDS_PHONEME.value
 
     def alpha_for(self, distortion_intensity: float) -> Optional[float]:
-        """Calibrated edit strength: 0.6 reaches 60% of the natural difference between the two sounds, 1 all of it.
-        None for a strength that is not in INTENSITIES."""
+        """Calibrated edit strength: 0.3 reaches 30% of the natural difference between the two sounds, 0.6 reaches 60%,
+        1 all of it. None for a strength that is not in INTENSITIES."""
         for intensity, alpha in self.parameters.intensity_alpha.items():
             if np.isclose(distortion_intensity, intensity) and np.isclose(INTENSITIES, intensity).any():
                 return float(alpha)
@@ -132,14 +132,11 @@ class PairDistorter(AudioDistorter):
         return self.__voice_f0.get(voice_of(seed_name), DEFAULT_F0)
 
     def __distorted_ipa(self, distortion_intensity: float) -> str:
-        if distortion_intensity > 0.5:
-            return TEXT_TO_IPA[self.TO_PHONEME]
-        return TEXT_TO_IPA[self.FROM_PHONEME]
+        """Every edited clip is labelled as the mistake; how far it went is its ``distortion_intensity`` (0.3, 0.6, 1)."""
+        return TEXT_TO_IPA[self.TO_PHONEME]
 
     def __distorted_to_ipa(self, distortion_intensity: float) -> str:
-        if distortion_intensity > 0.5:
-            return TEXT_TO_IPA[self.FROM_PHONEME]
-        return TEXT_TO_IPA[self.TO_PHONEME]
+        return TEXT_TO_IPA[self.FROM_PHONEME]
 
     def __match_nuisance(
         self, natural: np.ndarray, seed_name: str, distortion_intensity: float
