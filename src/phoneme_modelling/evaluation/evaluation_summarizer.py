@@ -37,20 +37,20 @@ class AudioEvaluationSummarizer():
                 model_voices[evaluation_result.model] = set()
             if evaluation_result.voice not in model_voices[evaluation_result.model]:
                 model_voices[evaluation_result.model].add(evaluation_result.voice)
+        phonemes = [ALL] + [phoneme.name.lower() for phoneme in IpaRepresentations]
+        groups = [(ALL, ALL)]
+        for model in model_voices.keys():
+            groups.append((model, ALL))
+            groups.extend((model, voice) for voice in model_voices[model])
         summaries: list[EvaluatorSummaryMetadata] = []
         for evaluation_method in evaluator_results.keys():
-            summaries.append(cls.build_metadata_for_key(evaluator_results, evaluation_method, ALL_KEY))
-            for phoneme in IpaRepresentations:
-                phoneme_key = (ALL, ALL, phoneme.name.lower())
-                if not phoneme_key in evaluator_results[evaluation_method]:
-                    continue
-                summaries.append(cls.build_metadata_for_key(evaluator_results, evaluation_method, phoneme_key))
-                for model in model_voices.keys():
-                    model_key = (model, ALL, ALL)
-                    summaries.append(cls.build_metadata_for_key(evaluator_results, evaluation_method, model_key))
-                    for voice in model_voices[model]:
-                        voice_key = (model, voice, ALL)
-                        summaries.append(cls.build_metadata_for_key(evaluator_results, evaluation_method, voice_key))
+            # Each group (overall, per model, per model+voice) gets an "all" row, then one row per sound it has.
+            for model, voice in groups:
+                for phoneme in phonemes:
+                    key = (model, voice, phoneme)
+                    if key not in evaluator_results[evaluation_method]:
+                        continue
+                    summaries.append(cls.build_metadata_for_key(evaluator_results, evaluation_method, key))
         DataFrame([entry.model_dump() for entry in summaries]).to_csv(evaluation_summary_path, index=False)
 
     @classmethod
@@ -59,10 +59,17 @@ class AudioEvaluationSummarizer():
         if name not in evaluator_results:
             evaluator_results[name] = {}
         specific_evaluator = evaluator_results[name]
-        phoneme_key = (ALL, ALL, evaluation_result.actual_phoneme_text)
-        model_key = (evaluation_result.model, ALL, ALL)
-        voice_key = (evaluation_result.model, evaluation_result.voice, ALL)
-        keys = [ALL_KEY, phoneme_key, model_key, voice_key]
+        model = evaluation_result.model
+        voice = evaluation_result.voice
+        phoneme = evaluation_result.actual_phoneme_text
+        keys = [
+            ALL_KEY,
+            (ALL, ALL, phoneme),
+            (model, ALL, ALL),
+            (model, ALL, phoneme),
+            (model, voice, ALL),
+            (model, voice, phoneme),
+        ]
         for key in keys:
             specific_evaluator = cls.ensure_key_exists(specific_evaluator, key)
             specific_evaluator[key][TOTAL] += 1

@@ -190,9 +190,18 @@
         "z_to_th_voiceless": null,
         "z_to_th_voiceless_matched": null
     },
+    "evaluate_only_undistorted": true,
+    "evaluation_audio_base_dir": "data",
     "evaluator_configs": {
         "wav2vec2": null,
         "wav2vec2_espeak": null,
-        "zipa": null
+        "zipa": null,
+        "gemini_listener": {
+            "model": "gemini-3.1-pro-preview",
+            "location": "global"
+        },
+        "openai_listener": {
+            "model": "gpt-audio-1.5"
+        }
     }
 }

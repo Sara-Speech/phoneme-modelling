@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Optional
 
 from pydantic import BaseModel
@@ -30,3 +31,5 @@ class PhonemePipelineConfig(BaseModel):
     generator_configs: dict[str, Any]
     distorter_configs: Optional[dict[str, Any]] = None
     evaluator_configs: Optional[dict[str, Any]] = None
+    evaluate_only_undistorted: bool = False  # skip clips with distortion_intensity > 0 during evaluation
+    evaluation_audio_base_dir: Optional[Path] = None  # relative file_paths in the metadata are resolved against this
