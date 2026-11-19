@@ -1,5 +1,9 @@
 .PHONY: help install install-dev lint lint-fix format test test-scripts test-verbose clean pre-commit-install pre-commit-run all-check
 
+# Put src/ on the import path directly. The editable-install .pth in .venv keeps getting the macOS "hidden" flag
+# (this folder is synced), and Python 3.13 ignores hidden .pth files, which breaks "import phoneme_modelling".
+export PYTHONPATH := $(CURDIR)/src
+
 # Default target
 help:
 	@echo "Available commands:"
@@ -77,6 +81,13 @@ generate:
 
 eval:
 	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval
+
+# LLM listeners (Gemini, OpenAI) on the downloaded Drive folder: data/phonemes_metadata.xlsx + data/phonemes/
+eval-llm:
+	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval --config_path config/llm_listener_eval.json \
+		--output_metadata_path data/phonemes_metadata.xlsx \
+		--evaluation_output_path data/llm_evaluation_results.csv \
+		--evaluation_summary_path data/llm_evaluation_summary.csv
 
 smoke-test:
 	make clean-output && uv run python src/phoneme_modelling/generate_synthetic_audio.py --config_path config/smoke_test.json

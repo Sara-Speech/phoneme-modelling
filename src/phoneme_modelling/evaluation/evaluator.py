@@ -22,4 +22,8 @@ class AudioEvaluator(ABC):
     @abstractmethod
     def evaluate(self, audio_info: SyntheticPhonemeMetadata) -> PhonemeEvaluation:
         raise NotImplementedError()
+
+    def evaluate_all(self, audio_infos: list[SyntheticPhonemeMetadata]) -> list[PhonemeEvaluation]:
+        """One evaluation per clip, in order. Evaluators that call an API override this to send requests in parallel."""
+        return [self.evaluate(audio_info) for audio_info in audio_infos]
     
