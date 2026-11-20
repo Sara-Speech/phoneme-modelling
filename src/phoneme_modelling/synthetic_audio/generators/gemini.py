@@ -17,7 +17,6 @@ from phoneme_modelling.synthetic_audio.llm_prompting import (
     load_prompts,
 )
 from phoneme_modelling.util.audio import save_raw_and_prepped, seconds
-from phoneme_modelling.util.env import load_env
 
 
 GEMINI_SAMPLE_RATE = 24000  # Live API output is 24 kHz 16-bit mono PCM
@@ -114,7 +113,6 @@ class GeminiAudioGenerator(SyntheticAudioGenerator):
 
     def _init_voices(self) -> list[SyntheticAudioGenerationVoice]:
         config = self.config
-        load_env(config.env_file)
         gcp_project = os.environ.get("GCP_PROJECT")
         client = genai.Client(vertexai=True, project=gcp_project, location=config.location)
         prompts = load_prompts(config.prompts_file)

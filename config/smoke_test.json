@@ -59,6 +59,7 @@
     "evaluator_configs": {
         "wav2vec2": null,
         "zipa": null,
-        "allosaurus": null
+        "allosaurus": null,
+        "sara": {"remote_path": "s3://sagemaker-us-east-2-381492152880/phoneme-finetuning-Aug23/final-model/"}
     }
 }

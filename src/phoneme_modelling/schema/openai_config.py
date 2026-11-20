@@ -11,4 +11,3 @@ class OpenAIConfig(BaseModel):
     prompts_file: Path  # csv with columns phoneme, phoneme_ipa, prompt
     takes: int = 1
     min_peak: float = 0.05  # takes quieter than this (0-1) are rejected: prep would boost the noise floor into static
-    env_file: Path = Path(".env")  # OPENAI_API_KEY=... (gitignored); an exported variable wins

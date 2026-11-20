@@ -202,7 +202,8 @@
         },
         "openai_listener": {
             "model": "gpt-audio-1.5"
-        }
-        "allosaurus": null
+        },
+        "allosaurus": null,
+        "sara": {"remote_path": "s3://sagemaker-us-east-2-381492152880/phoneme-finetuning-Aug23/final-model/"}
     }
 }
