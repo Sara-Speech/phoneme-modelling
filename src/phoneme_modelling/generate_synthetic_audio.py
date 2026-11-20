@@ -8,6 +8,7 @@ from phoneme_modelling.evaluation.evaluation_summarizer import AudioEvaluationSu
 from phoneme_modelling.evaluation.pipeline import AudioEvaluationPipeline
 from phoneme_modelling.schema.phoneme_pipeline_config import PhonemePipelineConfig
 from phoneme_modelling.synthetic_audio.pipeline import SyntheticAudioPipeline
+from phoneme_modelling.util.env import load_env
 
 
 def main() -> None:
@@ -35,6 +36,8 @@ def main() -> None:
     with open(config_path, "r", encoding="utf-8") as config_file:
         config_dict = json.load(config_file)
         config = PhonemePipelineConfig.model_validate(config_dict)
+
+    load_env(config.env_path)
 
     if args.mode in ["all", "generate"]:
         if os.path.exists(output_metadata_path):

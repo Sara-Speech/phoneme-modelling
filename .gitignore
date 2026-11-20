@@ -229,3 +229,4 @@ __marimo__/
 phonemes/
 data/
 test_output/
+.hf_cache/

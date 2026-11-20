@@ -23,6 +23,7 @@ class PhonemeValidationConfig(BaseModel):
 
 
 class PhonemePipelineConfig(BaseModel):
+    env_path: Path = Path(".env")
     number_of_digits: int
     phonemes_to_generate: list[str]
     distortions_to_generate: Optional[list[PhonemeDistortionRequest]] = None

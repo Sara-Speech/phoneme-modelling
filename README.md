@@ -14,19 +14,34 @@ Settings live in `config/default.json`.
 ## Required Setup
 
 1. **Google Cloud Platform (GCP) Authentication & APIs:**
-   * Authenticate your local environment using the Google Cloud CLI[cite: 4]:
+   * Authenticate your local environment using the Google Cloud CLI:
      ```bash
      gcloud auth application-default login
      ```
-   * Ensure you have a GCP project to serve as your quota project[cite: 4].
-   * Enable the **Agent Platform API** and the **Cloud Text-to-Speech API** in your GCP project[cite: 4].
+   * Ensure you have a GCP project to serve as your quota project.
+   * Enable the **Agent Platform API** and the **Cloud Text-to-Speech API** in your GCP project.
 
-2. **Environment Variables:**
+2. **AWS SSO Setup:**
+   * Run AWS SSO configuration:
+     ```bash
+     aws configure sso
+     ```
+    * SSO session name: sara
+    * SSO start URL: https://identitycenter.amazonaws.com/ssoins-668464a2f6d7a56e
+    * SSO region: us-east-2
+    * SSO registration scopes: sso:account:access
+    * Default client Region: us-east-2
+    * CLI default output format (json if not specified): None
+    * Configure AWS skills and the AWS MCP server for your AI coding agent(s)?: n
+   * Save the profile name returned for the AWS_PROFILE env variable in step 3
+
+3. **Environment Variables:**
    * Retrieve the OpenAI API key from the AWS Secrets Manager: [openai_content_gen](https://381492152880-dopmmgh3.us-east-2.console.aws.amazon.com/secretsmanager/secret?name=openai_content_gen&region=us-east-2&tab=overview#).
-   * Create a `.env` file in the root of the project with your OpenAI API key and GCP project ID[cite: 2]:
+   * Create a `.env` file in the root of the project with your OpenAI API key and GCP project ID:
      ```env
      OPENAI_API_KEY=your_retrieved_aws_secret
      GCP_PROJECT=your_gcp_project_id
+     AWS_PROFILE=your_profile_from_step_2
      ```
 
 ## Distortions
