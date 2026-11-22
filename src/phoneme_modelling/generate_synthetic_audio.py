@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 
 from phoneme_modelling.distortion.pipeline import AudioDistortionPipeline
-from phoneme_modelling.evaluation.evaluation_summarizer import AudioEvaluationSummarizer
 from phoneme_modelling.evaluation.pipeline import AudioEvaluationPipeline
 from phoneme_modelling.schema.phoneme_pipeline_config import PhonemePipelineConfig
 from phoneme_modelling.synthetic_audio.pipeline import SyntheticAudioPipeline
@@ -19,6 +18,8 @@ def main() -> None:
     parser.add_argument("--evaluation_output_path", default="data/evaluation_results.csv")
     parser.add_argument("--evaluation_summary_path", default="data/evaluation_summary.csv")
     parser.add_argument("--mode", choices=["all", "generate", "eval"], default="all")
+    parser.add_argument("--evaluators", nargs="+",
+                        help="run only these entries of the config's evaluator_configs (default: all of them)")
     args = parser.parse_args()
 
     config_path = Path(args.config_path)
@@ -36,6 +37,12 @@ def main() -> None:
     with open(config_path, "r", encoding="utf-8") as config_file:
         config_dict = json.load(config_file)
         config = PhonemePipelineConfig.model_validate(config_dict)
+    if args.evaluators:
+        configured = config.evaluator_configs or {}
+        unknown = sorted(set(args.evaluators) - set(configured))
+        if unknown:
+            parser.error(f"--evaluators {unknown} not in {config_path} evaluator_configs: {sorted(configured)}")
+        config.evaluator_configs = {name: configured[name] for name in args.evaluators}
 
     load_env(config.env_path)
 
@@ -49,8 +56,7 @@ def main() -> None:
             os.remove(evaluation_output_path)
         if os.path.exists(evaluation_summary_path):
             os.remove(evaluation_summary_path)
-        AudioEvaluationPipeline.run(config, output_metadata_path, evaluation_output_path)
-        AudioEvaluationSummarizer.run(evaluation_output_path, evaluation_summary_path)
+        AudioEvaluationPipeline.run(config, output_metadata_path, evaluation_output_path, evaluation_summary_path)
 
 if __name__ == "__main__":
     main()

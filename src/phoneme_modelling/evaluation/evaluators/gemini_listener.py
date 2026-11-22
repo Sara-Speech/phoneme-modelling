@@ -1,19 +1,27 @@
 import os
 
 from google import genai
-from google.genai.types import GenerateContentConfig, Part
+from google.genai.types import GenerateContentConfig, HttpOptions, Part
 
 from phoneme_modelling.evaluation.llm_listening import LISTENER_PROMPT, RESPONSE_JSON_SCHEMA, LLMListenerEvaluator
 from phoneme_modelling.schema.llm_listener_config import GeminiListenerConfig
 
 
 
-class GeminiListenerEvaluator(LLMListenerEvaluator):
-    """Gemini on Vertex AI (GCP_PROJECT), through generate_content with the WAV file as an inline part."""
+class Gemini31ProListenerEvaluator(LLMListenerEvaluator):
+    """Gemini on Vertex AI (GCP_PROJECT), through generate_content with the WAV file as an inline part.
+
+    Configured with gemini-3.1-pro-preview; the model itself comes from the config's "model". Its name stays
+    "gemini_listener" so earlier results and cached answers still match."""
 
     def __init__(self, config: GeminiListenerConfig):
         super().__init__(config)
-        self.client = genai.Client(vertexai=True, project=os.environ.get("GCP_PROJECT"), location=config.location)
+        self.client = genai.Client(
+            vertexai=True,
+            project=os.environ.get("GCP_PROJECT"),
+            location=config.location,
+            http_options=HttpOptions(timeout=int(config.request_timeout_seconds * 1000)),  # milliseconds
+        )
 
     @staticmethod
     def get_name() -> str:
@@ -29,3 +37,19 @@ class GeminiListenerEvaluator(LLMListenerEvaluator):
             ),
         )
         return response.text or ""
+
+
+class Gemini4NeonListenerEvaluator(Gemini31ProListenerEvaluator):
+    """The same Gemini listener under its own name, so its results are kept apart from the other Gemini listeners'."""
+
+    @staticmethod
+    def get_name() -> str:
+        return "gemini_4_neon_listener"
+
+
+class Gemini4CarbonListenerEvaluator(Gemini31ProListenerEvaluator):
+    """The same Gemini listener under its own name, so its results are kept apart from the other Gemini listeners'."""
+
+    @staticmethod
+    def get_name() -> str:
+        return "gemini_4_carbon_listener"
