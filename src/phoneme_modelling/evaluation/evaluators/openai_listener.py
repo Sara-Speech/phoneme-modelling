@@ -17,7 +17,8 @@ class OpenAIListenerEvaluator(LLMListenerEvaluator):
 
     def __init__(self, config: LLMListenerConfig):
         super().__init__(config)
-        self.client = OpenAI()  # reads OPENAI_API_KEY
+        # reads OPENAI_API_KEY; retries are done by LLMListenerEvaluator, so the SDK's own are turned off
+        self.client = OpenAI(timeout=config.request_timeout_seconds, max_retries=0)
 
     @staticmethod
     def get_name() -> str:

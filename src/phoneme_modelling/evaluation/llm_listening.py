@@ -1,7 +1,7 @@
 """Shared logic for evaluators that ask a multimodal LLM to listen to a clip and transcribe it in IPA.
 
-The model is blind: it is not told which sound the clip should be, and it is not given the list of phonemes. It only
-writes the IPA it hears. That IPA is then mapped to one of the phonemes in IpaRepresentations by ipa_to_phoneme, in
+The model is not told which sound the clip should be. It is given the list of the phonemes in IpaRepresentations
+(each with an example word) and writes the IPA it hears. That IPA is then mapped to one of the phonemes in IpaRepresentations by ipa_to_phoneme, in
 code, so the mapping is deterministic and the same for every model.
 
 Answers are cached per clip (keyed by model, prompt version and the audio's hash), so a rerun or an interrupted run
@@ -9,6 +9,7 @@ doesn't pay for clips it already has.
 """
 import hashlib
 import json
+import random
 import re
 import time
 import unicodedata
@@ -20,22 +21,55 @@ from typing import Optional
 from pydantic import BaseModel
 
 from phoneme_modelling.evaluation.evaluator import AudioEvaluator
-from phoneme_modelling.phonemes import IPA_TO_TEXT
+from phoneme_modelling.phonemes import IPA_TO_TEXT, IpaRepresentations
 from phoneme_modelling.schema.llm_listener_config import LLMListenerConfig
 from phoneme_modelling.schema.phoneme_evaluation import PhonemeEvaluation
 from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 
 
-PROMPT_VERSION = 1  # bump when LISTENER_PROMPT changes, so answers cached under the old prompt are not reused
+PROMPT_VERSION = 2  # bump when LISTENER_PROMPT changes, so answers cached under the old prompt are not reused
 
-LISTENER_PROMPT = """You are an expert phonetician. Listen to the audio clip and transcribe exactly what you hear in \
+# An English word for each phoneme, so the model reads each IPA symbol the intended way (j is the "y" in "yes").
+EXAMPLE_WORDS = {
+    IpaRepresentations.R: "red",
+    IpaRepresentations.S: "sun",
+    IpaRepresentations.G: "go",
+    IpaRepresentations.B: "bat",
+    IpaRepresentations.Z: "zoo",
+    IpaRepresentations.L: "leg",
+    IpaRepresentations.TH_VOICED: "this",
+    IpaRepresentations.TH_VOICELESS: "think",
+    IpaRepresentations.SH: "she",
+    IpaRepresentations.CH: "chair",
+    IpaRepresentations.K: "cat",
+    IpaRepresentations.V: "van",
+    IpaRepresentations.J: "jam",
+    IpaRepresentations.T: "top",
+    IpaRepresentations.D: "dog",
+    IpaRepresentations.F: "fan",
+    IpaRepresentations.NG: "sing",
+    IpaRepresentations.Y: "yes",
+    IpaRepresentations.W: "wet",
+    IpaRepresentations.H: "hat",
+    IpaRepresentations.N: "net",
+    IpaRepresentations.M: "man",
+    IpaRepresentations.P: "pen",
+}
+PHONEME_LIST = "\n".join(f"- {phoneme.value} (as in \"{EXAMPLE_WORDS[phoneme]}\")" for phoneme in IpaRepresentations)
+
+LISTENER_PROMPT = f"""You are an expert phonetician. Listen to the audio clip and transcribe the consonant you hear in \
 the International Phonetic Alphabet.
 
-The clip is a short recording of an isolated speech sound, not a word. Transcribe what is actually said, not what the \
-speaker probably meant, and don't guess a word. Use standard IPA symbols only (no letters spelled out, no slashes or \
-brackets). If there is no speech, use an empty string.
+The clip is a short recording of an isolated English consonant, not a word, possibly with a short vowel before or after \
+it. It should be one of these {len(IpaRepresentations)} consonants:
+{PHONEME_LIST}
 
-Reply with only a JSON object of the form {"ipa": "<your transcription>"}."""
+Transcribe what is actually said, not what the speaker probably meant, and don't guess a word. Answer with the symbol \
+from the list that matches the consonant you hear. If it is clearly none of them, write the IPA of what you hear \
+instead. Use standard IPA symbols only (no letters spelled out, no slashes or brackets). If there is no speech, use an \
+empty string.
+
+Reply with only a JSON object of the form {{"ipa": "<your transcription>"}}."""
 
 RESPONSE_JSON_SCHEMA = {
     "type": "object",
@@ -147,13 +181,34 @@ class LLMListenerEvaluator(AudioEvaluator):
         cache_file = self.cache_dir / f"{key}.json"
         if cache_file.exists():
             return ListenerAnswer.model_validate_json(cache_file.read_text()).ipa
-        for attempt in range(self.config.max_retries + 1):
+        errors = rate_limits = 0
+        while True:
             try:
                 answer = parse_answer(self._transcribe(audio))
                 cache_file.write_text(answer.model_dump_json())
                 print(f"{self.get_name()} {path.name}: {answer.ipa!r}")
                 return answer.ipa
-            except Exception as e:  # rate limits, network errors, malformed answers
-                print(f"{self.get_name()} {path.name}: attempt {attempt + 1} failed: {e}")
-                time.sleep(2 ** attempt)
-        return None
+            except Exception as e:  # rate limits, timeouts, network errors, malformed answers
+                if is_rate_limit(e):
+                    rate_limits += 1
+                    if rate_limits > self.config.max_rate_limit_retries:
+                        print(f"{self.get_name()} {path.name}: gave up after {rate_limits} rate limits")
+                        return None
+                    # Jitter so the parallel requests don't all retry at the same moment and hit the limit again.
+                    wait = min(self.config.rate_limit_wait_seconds * 2 ** (rate_limits - 1), 300) * random.uniform(1, 1.5)
+                    # The message says which limit it was: "Resource exhausted. Please try again later" is Google's
+                    # shared capacity; "Quota exceeded for ..." names a quota of the project.
+                    print(f"{self.get_name()} {path.name}: rate limited ({e}), retrying in {wait:.0f} s")
+                else:
+                    errors += 1
+                    if errors > self.config.max_retries:
+                        print(f"{self.get_name()} {path.name}: gave up after {errors} errors, last: {e}")
+                        return None
+                    wait = 2 ** (errors - 1)
+                    print(f"{self.get_name()} {path.name}: attempt failed ({e}), retrying in {wait} s")
+                time.sleep(wait)
+
+
+def is_rate_limit(error: Exception) -> bool:
+    """A 429 / quota error: google-genai sets .code, openai sets .status_code."""
+    return getattr(error, "code", None) == 429 or getattr(error, "status_code", None) == 429

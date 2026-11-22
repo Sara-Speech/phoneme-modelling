@@ -1,4 +1,5 @@
-from typing import Any
+import os
+from typing import Any, Optional
 
 from pandas import DataFrame
 from pathlib import Path
@@ -7,7 +8,12 @@ from phoneme_modelling.evaluation.evaluators.allosaurus import AllosaurusEvaluat
 from phoneme_modelling.evaluation.evaluators.debug import DebugEvaluator
 from phoneme_modelling.evaluation.evaluator import AudioEvaluator
 from phoneme_modelling.evaluation.evaluator_factory import AudioEvaluatorFactory
-from phoneme_modelling.evaluation.evaluators.gemini_listener import GeminiListenerEvaluator
+from phoneme_modelling.evaluation.evaluation_summarizer import AudioEvaluationSummarizer
+from phoneme_modelling.evaluation.evaluators.gemini_listener import (
+    Gemini31ProListenerEvaluator,
+    Gemini4CarbonListenerEvaluator,
+    Gemini4NeonListenerEvaluator,
+)
 from phoneme_modelling.evaluation.evaluators.openai_listener import OpenAIListenerEvaluator
 from phoneme_modelling.evaluation.evaluators.sara_model import SaraModelEvaluator
 from phoneme_modelling.evaluation.evaluators.wav2vec2 import Wav2Vec2Evaluator
@@ -29,7 +35,9 @@ class AudioEvaluationPipeline():
         factory.register(Wav2Vec2Evaluator, None)
         factory.register(Wav2Vec2EspeakEvaluator, None)
         factory.register(ZipaEvaluator, None)
-        factory.register(GeminiListenerEvaluator, GeminiListenerConfig)
+        factory.register(Gemini31ProListenerEvaluator, GeminiListenerConfig)
+        factory.register(Gemini4NeonListenerEvaluator, GeminiListenerConfig)
+        factory.register(Gemini4CarbonListenerEvaluator, GeminiListenerConfig)
         factory.register(OpenAIListenerEvaluator, LLMListenerConfig)
         factory.register(AllosaurusEvaluator, None)
         factory.register(SaraModelEvaluator, SaraModelEvaluatorConfig)
@@ -41,7 +49,10 @@ class AudioEvaluationPipeline():
         pipeline_config: PhonemePipelineConfig,
         audio_metadata_file_path: Path,
         evaluation_output_path: Path,
+        evaluation_summary_path: Optional[Path] = None,
     ) -> None:
+        """Runs each evaluator in turn. The results file (and the summary, if a path is given) is rewritten after
+        every evaluator, so a slow, failing or interrupted evaluator doesn't hold back the results of earlier ones."""
         evaluation_output: list[PhonemeEvaluationOutput] = []
         evaluator_configs = pipeline_config.evaluator_configs
         if evaluator_configs is None:
@@ -65,4 +76,14 @@ class AudioEvaluationPipeline():
                     **result.model_dump(),
                     is_distorted=audio_info.distortion_intensity > 0)
                 evaluation_output.append(output)
-        DataFrame([entry.model_dump() for entry in evaluation_output]).to_csv(evaluation_output_path, index=False)
+            cls.write_results(evaluation_output, Path(evaluation_output_path))
+            if evaluation_summary_path is not None:
+                AudioEvaluationSummarizer.run(Path(evaluation_output_path), Path(evaluation_summary_path))
+            print(f"{evaluator.get_name()} done; results written to {evaluation_output_path}")
+
+    @staticmethod
+    def write_results(evaluation_output: list[PhonemeEvaluationOutput], evaluation_output_path: Path) -> None:
+        """Writes to a temporary file and renames it, so stopping the run mid-write can't leave a half-written CSV."""
+        temporary_path = evaluation_output_path.with_name(evaluation_output_path.name + ".tmp")
+        DataFrame([entry.model_dump() for entry in evaluation_output]).to_csv(temporary_path, index=False)
+        os.replace(temporary_path, evaluation_output_path)

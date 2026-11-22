@@ -11,6 +11,40 @@ make run           # both
 
 Settings live in `config/default.json`.
 
+`make eval` reads `data/phonemes_metadata.csv`. To evaluate the hand-reviewed clips downloaded from Drive (the audio in
+`data/phonemes/` plus `data/phonemes_metadata.xlsx`), first copy the spreadsheet to that CSV. Rows marked Y in its
+`Remove?` column are skipped. Rerun this whenever the spreadsheet changes:
+
+```bash
+PYTHONPATH=src uv run python -m phoneme_modelling.util.prepare_metadata
+```
+
+The `make` targets run `src/phoneme_modelling/generate_synthetic_audio.py` with default options (`make eval` is
+`--mode eval`). Run the script directly to change them for one run. Start the command with `PYTHONPATH=src`, as the
+Makefile does: on synced folders macOS hides the package's `.pth` file in `.venv`, and Python then can't find
+`phoneme_modelling`.
+
+| Option | Default | What it sets |
+|---|---|---|
+| `--mode` | `all` | `generate`, `eval`, or `all` (both) |
+| `--evaluators` | all in the config | Only these entries of `evaluator_configs` |
+| `--config_path` | `config/default.json` | Settings file |
+| `--output_metadata_path` | `data/phonemes_metadata.csv` | Clip list: written by generate, read by eval |
+| `--evaluation_output_path` | `data/evaluation_results.csv` | Per-clip results |
+| `--evaluation_summary_path` | `data/evaluation_summary.csv` | Accuracy tables |
+
+For example, to run only the Gemini 4 listeners and keep their results separate:
+
+```bash
+PYTHONPATH=src uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval \
+  --evaluators gemini_4_neon_listener gemini_4_carbon_listener \
+  --evaluation_output_path data/gemini4_results.csv \
+  --evaluation_summary_path data/gemini4_summary.csv
+```
+
+The LLM listeners cache each answer in `data/llm_listener_cache/`, so rerunning them only pays for clips they haven't
+answered yet.
+
 ## Required Setup
 
 1. **Google Cloud Platform (GCP) Authentication & APIs:**
