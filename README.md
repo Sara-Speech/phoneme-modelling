@@ -11,6 +11,14 @@ make run           # both
 
 Settings live in `config/default.json`.
 
+`make eval` reads `data/phonemes_metadata.csv`. To evaluate the hand-reviewed clips downloaded from Drive (the audio in
+`data/phonemes/` plus `data/phonemes_metadata.xlsx`), first copy the spreadsheet to that CSV. Rows marked Y in its
+`Remove?` column are skipped. Rerun this whenever the spreadsheet changes:
+
+```bash
+uv run python -m phoneme_modelling.util.prepare_metadata
+```
+
 ## Required Setup
 
 1. **Google Cloud Platform (GCP) Authentication & APIs:**

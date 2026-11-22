@@ -200,16 +200,6 @@
             "model": "gemini-3.1-pro-preview",
             "location": "global"
         },
-        "gemini_4_neon_listener": {
-            "model": "gemini-4-neon",
-            "location": "global",
-            "max_concurrent_requests": 2
-        },
-        "gemini_4_carbon_listener": {
-            "model": "gemini-4-carbon",
-            "location": "global",
-            "max_concurrent_requests": 2
-        },
         "openai_listener": {
             "model": "gpt-audio-1.5"
         },

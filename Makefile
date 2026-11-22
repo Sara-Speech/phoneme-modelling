@@ -84,7 +84,7 @@ eval:
 
 # LLM listeners (Gemini, OpenAI) on the downloaded Drive folder: data/phonemes_metadata.xlsx + data/phonemes/
 eval-llm:
-	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval --evaluators gemini_listener gemini_4_neon_listener gemini_4_carbon_listener openai_listener \
+	uv run python src/phoneme_modelling/generate_synthetic_audio.py --mode eval --evaluators gemini_listener openai_listener \
 		--output_metadata_path data/phonemes_metadata.xlsx \
 		--evaluation_output_path data/llm_evaluation_results.csv \
 		--evaluation_summary_path data/llm_evaluation_summary.csv
