@@ -196,7 +196,9 @@ class LLMListenerEvaluator(AudioEvaluator):
                         return None
                     # Jitter so the parallel requests don't all retry at the same moment and hit the limit again.
                     wait = min(self.config.rate_limit_wait_seconds * 2 ** (rate_limits - 1), 300) * random.uniform(1, 1.5)
-                    print(f"{self.get_name()} {path.name}: rate limited (429), retrying in {wait:.0f} s")
+                    # The message says which limit it was: "Resource exhausted. Please try again later" is Google's
+                    # shared capacity; "Quota exceeded for ..." names a quota of the project.
+                    print(f"{self.get_name()} {path.name}: rate limited ({e}), retrying in {wait:.0f} s")
                 else:
                     errors += 1
                     if errors > self.config.max_retries:
