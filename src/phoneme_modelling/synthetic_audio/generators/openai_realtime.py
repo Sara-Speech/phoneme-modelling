@@ -17,7 +17,6 @@ from phoneme_modelling.synthetic_audio.llm_prompting import (
     load_prompts,
 )
 from phoneme_modelling.util.audio import peak, resample_pcm16, save_raw_and_prepped, save_wav, seconds
-from phoneme_modelling.util.env import load_env
 
 
 OPENAI_SAMPLE_RATE = 24000  # Realtime audio in and out is 24 kHz 16-bit mono PCM
@@ -125,7 +124,6 @@ class OpenAIAudioGenerator(SyntheticAudioGenerator):
 
     def _init_voices(self) -> list[SyntheticAudioGenerationVoice]:
         config = self.config
-        load_env(config.env_file)
         client = OpenAI()  # reads OPENAI_API_KEY
         prompts = load_prompts(config.prompts_file)
         return [

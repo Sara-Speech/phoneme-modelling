@@ -9,12 +9,14 @@ from phoneme_modelling.evaluation.evaluator import AudioEvaluator
 from phoneme_modelling.evaluation.evaluator_factory import AudioEvaluatorFactory
 from phoneme_modelling.evaluation.evaluators.gemini_listener import GeminiListenerEvaluator
 from phoneme_modelling.evaluation.evaluators.openai_listener import OpenAIListenerEvaluator
+from phoneme_modelling.evaluation.evaluators.sara_model import SaraModelEvaluator
 from phoneme_modelling.evaluation.evaluators.wav2vec2 import Wav2Vec2Evaluator
 from phoneme_modelling.evaluation.evaluators.wav2vec2_espeak import Wav2Vec2EspeakEvaluator
 from phoneme_modelling.evaluation.evaluators.zipa import ZipaEvaluator
 from phoneme_modelling.schema.llm_listener_config import GeminiListenerConfig, LLMListenerConfig
 from phoneme_modelling.schema.phoneme_evaluation import PhonemeEvaluationOutput
 from phoneme_modelling.schema.phoneme_pipeline_config import PhonemePipelineConfig
+from phoneme_modelling.schema.sara_model_evaluator_config import SaraModelEvaluatorConfig
 from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
 from phoneme_modelling.util.loaders import load_audio_metadata
 
@@ -30,6 +32,7 @@ class AudioEvaluationPipeline():
         factory.register(GeminiListenerEvaluator, GeminiListenerConfig)
         factory.register(OpenAIListenerEvaluator, LLMListenerConfig)
         factory.register(AllosaurusEvaluator, None)
+        factory.register(SaraModelEvaluator, SaraModelEvaluatorConfig)
         return factory.generate(configs)
 
     @classmethod

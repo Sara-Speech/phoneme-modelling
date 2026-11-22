@@ -24,7 +24,6 @@ from phoneme_modelling.phonemes import IPA_TO_TEXT
 from phoneme_modelling.schema.llm_listener_config import LLMListenerConfig
 from phoneme_modelling.schema.phoneme_evaluation import PhonemeEvaluation
 from phoneme_modelling.schema.synthetic_phoneme_metadata import SyntheticPhonemeMetadata
-from phoneme_modelling.util.env import load_env
 
 
 PROMPT_VERSION = 1  # bump when LISTENER_PROMPT changes, so answers cached under the old prompt are not reused
@@ -115,7 +114,6 @@ class LLMListenerEvaluator(AudioEvaluator):
 
     def __init__(self, config: LLMListenerConfig):
         self.config = config
-        load_env(config.env_file)
         self.cache_dir = Path(config.cache_dir) / self.get_name()
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
